@@ -1,10 +1,7 @@
-name: Github Release Workflow
+name: Github Build Workflow
 
 on:
-  push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
-
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,42 +34,11 @@ jobs:
 
       - name: Build APK
         id: build
-        run: bash ./gradlew assembleTempoRelease
-
-      - name: Sign APK
-        id: sign_apk
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/tempo/release
-          signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
-          alias: ${{ secrets.KEY_ALIAS_GITHUB }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD_GITHUB }}
-        env:
-          BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
+        run: bash ./gradlew assemble
 
       - name: Make artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-signed
-          path: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          name: output
+          path: ./app/build/outputs
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release v${{ github.ref }}
-          body: '> Changelog coming soon'
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Upload APK
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{steps.sign_apk.outputs.signedReleaseFile}}
-          asset_name: app-tempo-release.apk
-          asset_content_type: application/zip
