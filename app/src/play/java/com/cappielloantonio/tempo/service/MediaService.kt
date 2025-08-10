@@ -33,6 +33,7 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
     private lateinit var player: ExoPlayer
     private lateinit var castPlayer: CastPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
+    private lateinit var librarySessionCallback: MediaLibrarySessionCallback
 
     override fun onCreate() {
         super.onCreate()
@@ -79,6 +80,9 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
                 .setWakeMode(C.WAKE_MODE_NETWORK)
                 .setLoadControl(initializeLoadControl())
                 .build()
+
+        player.shuffleModeEnabled = Preferences.isShuffleModeEnabled()
+        player.repeatMode = Preferences.getRepeatMode()
     }
 
     private fun initializeCastPlayer() {
@@ -97,13 +101,14 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
                     getPendingIntent(0, FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT)
                 }
 
+        librarySessionCallback = createLibrarySessionCallback()
         mediaLibrarySession =
-                MediaLibrarySession.Builder(this, player, createLibrarySessionCallback())
+                MediaLibrarySession.Builder(this, player, librarySessionCallback)
                         .setSessionActivity(sessionActivityPendingIntent)
                         .build()
     }
 
-    private fun createLibrarySessionCallback(): MediaLibrarySession.Callback {
+    private fun createLibrarySessionCallback(): MediaLibrarySessionCallback {
         return MediaLibrarySessionCallback(this, automotiveRepository)
     }
 
@@ -165,6 +170,20 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
                         MediaManager.setLastPlayedTimestamp(newPosition.mediaItem)
                     }
                 }
+            }
+
+            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                Preferences.setShuffleModeEnabled(shuffleModeEnabled)
+                mediaLibrarySession.setCustomLayout(
+                        librarySessionCallback.buildCustomLayout(player)
+                )
+            }
+
+            override fun onRepeatModeChanged(repeatMode: Int) {
+                Preferences.setRepeatMode(repeatMode)
+                mediaLibrarySession.setCustomLayout(
+                        librarySessionCallback.buildCustomLayout(player)
+                )
             }
         })
     }

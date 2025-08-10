@@ -37,6 +37,8 @@ class Chronology(@PrimaryKey override val id: String) : Child(id) {
         transcodedSuffix = mediaItem.mediaMetadata.extras!!.getString("transcodedSuffix")
         duration = mediaItem.mediaMetadata.extras!!.getInt("duration")
         bitrate = mediaItem.mediaMetadata.extras!!.getInt("bitrate")
+        samplingRate = mediaItem.mediaMetadata.extras!!.getInt("samplingRate")
+        bitDepth = mediaItem.mediaMetadata.extras!!.getInt("bitDepth")
         path = mediaItem.mediaMetadata.extras!!.getString("path")
         isVideo = mediaItem.mediaMetadata.extras!!.getBoolean("isVideo")
         userRating = mediaItem.mediaMetadata.extras!!.getInt("userRating")

@@ -8,6 +8,7 @@ import android.graphics.drawable.InsetDrawable;
 import androidx.core.os.LocaleListCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 
+import com.cappielloantonio.tempo.App;
 import com.cappielloantonio.tempo.R;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -15,9 +16,10 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -74,17 +76,32 @@ public class UIUtil {
     public static Map<String, String> getLangPreferenceDropdownEntries(Context context) {
         LocaleListCompat localeList = getLocalesFromResources(context);
 
-        Map<String, String> map = new HashMap<>();
+        List<Map.Entry<String, String>> localeArrayList = new ArrayList<>();
+
+        String systemDefaultLabel = App.getContext().getString(R.string.settings_system_language);
+        String systemDefaultValue = "default";
 
         for (int i = 0; i < localeList.size(); i++) {
             Locale locale = localeList.get(i);
-
             if (locale != null) {
-                map.put(Util.toPascalCase(locale.getDisplayName()), locale.toLanguageTag());
+                localeArrayList.add(
+                        new AbstractMap.SimpleEntry<>(
+                                Util.toPascalCase(locale.getDisplayName()),
+                                locale.toLanguageTag()
+                        )
+                );
             }
         }
 
-        return map;
+        localeArrayList.sort(Map.Entry.comparingByKey(String.CASE_INSENSITIVE_ORDER));
+
+        LinkedHashMap<String, String> orderedMap = new LinkedHashMap<>();
+        orderedMap.put(systemDefaultLabel, systemDefaultValue);
+        for (Map.Entry<String, String> entry : localeArrayList) {
+            orderedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return orderedMap;
     }
 
     public static String getReadableDate(Date date) {

@@ -48,7 +48,7 @@ public class CacheUtil {
                 NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
 
                 if (capabilities != null) {
-                    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+                    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
                 }
             }
         }

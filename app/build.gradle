@@ -10,8 +10,8 @@ android {
         minSdkVersion 24
         targetSdk 35
 
-        versionCode 26
-        versionName '3.9.0'
+        versionCode 27
+        versionName '3.11.2'
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
@@ -110,4 +110,9 @@ dependencies {
 
     // Lyric-Getter-API https://github.com/xiaowine/Lyric-Getter-Api
     implementation 'com.github.xiaowine:Lyric-Getter-Api:6.0.0'
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

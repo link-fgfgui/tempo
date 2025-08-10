@@ -94,7 +94,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Child>> getRandomShuffleSample() {
-        return songRepository.getRandomSample(100, null, null);
+        return songRepository.getRandomSample(1000, null, null);
     }
 
     public LiveData<List<Chronology>> getChronologySample(LifecycleOwner owner) {

@@ -80,13 +80,13 @@ public class HomeFragment extends Fragment {
     private void initHomePager() {
         HomePager pager = new HomePager(this);
 
-        pager.addFragment(new HomeTabMusicFragment(), "Music", R.drawable.ic_home);
+        pager.addFragment(new HomeTabMusicFragment(), getString(R.string.home_section_music), R.drawable.ic_home);
 
         if (Preferences.isPodcastSectionVisible())
-            pager.addFragment(new HomeTabPodcastFragment(), "Podcast", R.drawable.ic_graphic_eq);
+            pager.addFragment(new HomeTabPodcastFragment(), getString(R.string.home_section_podcast), R.drawable.ic_graphic_eq);
 
         if (Preferences.isRadioSectionVisible())
-            pager.addFragment(new HomeTabRadioFragment(), "Radio", R.drawable.ic_play_for_work);
+            pager.addFragment(new HomeTabRadioFragment(), getString(R.string.home_section_radio), R.drawable.ic_play_for_work);
 
         bind.homeViewPager.setAdapter(pager);
         bind.homeViewPager.setOffscreenPageLimit(3);

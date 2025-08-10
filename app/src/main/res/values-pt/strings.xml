@@ -3,6 +3,7 @@
     <string name="activity_battery_optimizations_summary">Por favor, desative as otimizações de bateria para a reprodução de mídia enquanto a tela estiver desligada.</string>
     <string name="activity_battery_optimizations_title">Otimizações de bateria</string>
     <string name="activity_info_offline_mode">Modo offline</string>
+    <string name="album_bottom_sheet_add_to_playlist">Adicionar a uma playlist</string>
     <string name="album_bottom_sheet_add_to_queue">Adicionar à fila</string>
     <string name="album_bottom_sheet_download_all">Baixar todos</string>
     <string name="album_bottom_sheet_go_to_artist">Ir para o(a) artista</string>
@@ -134,6 +135,7 @@
     <string name="login_title_expanded">Servidores Subsonic</string>
     <string name="media_route_menu_title">Transmitir</string>
     <string name="menu_add_button">Adicionar</string>
+    <string name="menu_add_to_playlist_button">Adicionar a uma playlist</string>
     <string name="menu_download_all_button">Baixar todos</string>
     <string name="menu_download_label">Download</string>
     <string name="menu_filter_all">Todos</string>
@@ -160,6 +162,8 @@
     <string name="playlist_chooser_dialog_negative_button">Cancelar</string>
     <string name="playlist_chooser_dialog_neutral_button">Criar</string>
     <string name="playlist_chooser_dialog_title">Adicionar a uma playlist</string>
+    <string name="playlist_chooser_dialog_toast_add_success">Adicionada playlist de reprodução</string>
+    <string name="playlist_chooser_dialog_toast_add_failure">Falha ao adicionar uma playlist de reprodução</string>
     <string name="playlist_counted_tracks">%1$d faixas •  %2$s</string>
     <string name="playlist_duration">Duração  •  %1$s</string>
     <string name="playlist_editor_dialog_hint_name">Nome da playlist</string>
@@ -246,7 +250,7 @@
     <string name="settings_download_storage_title">Armazenamento dos downloads</string>
     <string name="settings_equalizer_summary">Ajustar configurações de áudio</string>
     <string name="settings_equalizer_title">Equalizador</string>
-    <string name="settings_github_link">https://github.com/CappielloAntonio/tempo</string>
+    <string name="settings_github_link">https://github.com/eddyizm/tempo</string>
     <string name="settings_github_summary">Acompanhe o desenvolvimento</string>
     <string name="settings_github_title">Github</string>
     <string name="settings_image_size">Definir resolução da imagem</string>

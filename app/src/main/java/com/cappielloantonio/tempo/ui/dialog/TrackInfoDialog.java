@@ -72,6 +72,8 @@ public class TrackInfoDialog extends DialogFragment {
             bind.transcodedSuffixValueSector.setText(mediaMetadata.extras.getString("transcodedSuffix", getString(R.string.label_placeholder)));
             bind.durationValueSector.setText(MusicUtil.getReadableDurationString(mediaMetadata.extras.getInt("duration", 0), false));
             bind.bitrateValueSector.setText(mediaMetadata.extras.getInt("bitrate", 0) + " kbps");
+            bind.samplingRateValueSector.setText(mediaMetadata.extras.getInt("samplingRate", 0) != 0 ? mediaMetadata.extras.getInt("samplingRate", 0) + " Hz" : getString(R.string.label_placeholder));
+            bind.bitDepthValueSector.setText(mediaMetadata.extras.getInt("bitDepth", 0) != 0 ? mediaMetadata.extras.getInt("bitDepth", 0) + " bits" : getString(R.string.label_placeholder));
             bind.pathValueSector.setText(mediaMetadata.extras.getString("path", getString(R.string.label_placeholder)));
             bind.discNumberValueSector.setText(String.valueOf(mediaMetadata.extras.getInt("discNumber", 0)));
         }

@@ -21,6 +21,7 @@ public class AlbumPageViewModel extends AndroidViewModel {
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
     private String albumId;
+    private String artistId;
     private final MutableLiveData<AlbumID3> album = new MutableLiveData<>(null);
 
     public AlbumPageViewModel(@NonNull Application application) {
@@ -41,6 +42,7 @@ public class AlbumPageViewModel extends AndroidViewModel {
     public void setAlbum(LifecycleOwner owner, AlbumID3 album) {
         this.albumId = album.getId();
         this.album.postValue(album);
+        this.artistId = album.getArtistId();
 
         albumRepository.getAlbum(album.getId()).observe(owner, albums -> {
             if (albums != null) this.album.setValue(albums);
@@ -48,7 +50,7 @@ public class AlbumPageViewModel extends AndroidViewModel {
     }
 
     public LiveData<ArtistID3> getArtist() {
-        return artistRepository.getArtistInfo(albumId);
+        return artistRepository.getArtistInfo(artistId);
     }
 
     public LiveData<AlbumInfo> getAlbumInfo() {

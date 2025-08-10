@@ -1,6 +1,7 @@
 package com.cappielloantonio.tempo.util
 
 import android.util.Log
+import androidx.media3.common.Player
 import com.cappielloantonio.tempo.App
 import com.cappielloantonio.tempo.model.HomeSector
 import com.cappielloantonio.tempo.subsonic.models.OpenSubsonicExtension
@@ -24,6 +25,8 @@ object Preferences {
     private const val NEXT_SERVER_SWITCH = "next_server_switch"
     private const val PLAYBACK_SPEED = "playback_speed"
     private const val SKIP_SILENCE = "skip_silence"
+    private const val SHUFFLE_MODE = "shuffle_mode"
+    private const val REPEAT_MODE = "repeat_mode"
     private const val IMAGE_CACHE_SIZE = "image_cache_size"
     private const val STREAMING_CACHE_SIZE = "streaming_cache_size"
     private const val IMAGE_SIZE = "image_size"
@@ -224,6 +227,26 @@ object Preferences {
     @JvmStatic
     fun setSkipSilenceMode(isSkipSilenceMode: Boolean) {
         App.getInstance().preferences.edit().putBoolean(SKIP_SILENCE, isSkipSilenceMode).apply()
+    }
+
+    @JvmStatic
+    fun isShuffleModeEnabled(): Boolean {
+        return App.getInstance().preferences.getBoolean(SHUFFLE_MODE, false)
+    }
+
+    @JvmStatic
+    fun setShuffleModeEnabled(shuffleModeEnabled: Boolean) {
+        App.getInstance().preferences.edit().putBoolean(SHUFFLE_MODE, shuffleModeEnabled).apply()
+    }
+
+    @JvmStatic
+    fun getRepeatMode(): Int {
+        return App.getInstance().preferences.getInt(REPEAT_MODE, Player.REPEAT_MODE_OFF)
+    }
+
+    @JvmStatic
+    fun setRepeatMode(repeatMode: Int) {
+        App.getInstance().preferences.edit().putInt(REPEAT_MODE, repeatMode).apply()
     }
 
     @JvmStatic

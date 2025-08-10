@@ -1,5 +1,6 @@
 package com.cappielloantonio.tempo.ui.adapter;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.media3.session.MediaBrowser;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.RequestBuilder;
 import com.cappielloantonio.tempo.R;
 import com.cappielloantonio.tempo.databinding.ItemPlayerQueueSongBinding;
 import com.cappielloantonio.tempo.glide.CustomGlideRequest;
@@ -46,7 +48,7 @@ public class PlayerSongQueueAdapter extends RecyclerView.Adapter<PlayerSongQueue
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Child song = songs.get(position);
+        Child song = songs.get(holder.getLayoutPosition());
 
         holder.item.queueSongTitleTextView.setText(song.getTitle());
         holder.item.queueSongSubtitleTextView.setText(
@@ -58,15 +60,21 @@ public class PlayerSongQueueAdapter extends RecyclerView.Adapter<PlayerSongQueue
                 )
         );
 
+        RequestBuilder<Drawable> thumbnail = CustomGlideRequest.Builder
+                        .from(holder.itemView.getContext(), song.getCoverArtId(), CustomGlideRequest.ResourceType.Song)
+                        .build()
+                        .sizeMultiplier(0.1f);
+
         CustomGlideRequest.Builder
                 .from(holder.itemView.getContext(), song.getCoverArtId(), CustomGlideRequest.ResourceType.Song)
                 .build()
+                .thumbnail(thumbnail)
                 .into(holder.item.queueSongCoverImageView);
 
         MediaManager.getCurrentIndex(mediaBrowserListenableFuture, new MediaIndexCallback() {
             @Override
             public void onRecovery(int index) {
-                if (position < index) {
+                if (holder.getLayoutPosition() < index) {
                     holder.item.queueSongTitleTextView.setAlpha(0.2f);
                     holder.item.queueSongSubtitleTextView.setAlpha(0.2f);
                     holder.item.ratingIndicatorImageView.setAlpha(0.2f);

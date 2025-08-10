@@ -4,39 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/player_clean_queue_button"
+        style="@style/TitleMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="@string/player_queue_clean_all_button" />
+
     <com.cappielloantonio.tempo.helper.recyclerview.NestedScrollableHost
-        android:id="@+id/player_queue_nested_scrollable_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/player_queue_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp"
+            android:paddingTop="8dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingTop="8dp"
-                android:paddingBottom="@dimen/global_padding_bottom">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/player_queue_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-
-                <TextView
-                    android:id="@+id/player_clean_queue_button"
-                    style="@style/TitleMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/player_queue_clean_all_button"/>
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
     </com.cappielloantonio.tempo.helper.recyclerview.NestedScrollableHost>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

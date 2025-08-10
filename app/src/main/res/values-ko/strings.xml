@@ -3,6 +3,7 @@
     <string name="activity_battery_optimizations_summary">화면이 꺼진 상태에서 음악 재생을 하기 위해서는 배터리 최적화를 비활성화 해주세요.</string>
     <string name="activity_battery_optimizations_title">배터리 최적화</string>
     <string name="activity_info_offline_mode">오프라인 모드</string>
+    <string name="album_bottom_sheet_add_to_playlist">플레이리스트에 추가</string>
     <string name="album_bottom_sheet_add_to_queue">재생목록에 추가</string>
     <string name="album_bottom_sheet_download_all">모두 다운로드</string>
     <string name="album_bottom_sheet_go_to_artist">아티스트로 이동</string>
@@ -135,6 +136,7 @@
     <string name="login_title_expanded">Subsonic 서버</string>
     <string name="media_route_menu_title">Cast</string>
     <string name="menu_add_button">추가</string>
+    <string name="menu_add_to_playlist_button">플레이리스트에 추가</string>
     <string name="menu_download_all_button">모두 다운로드</string>
     <string name="menu_download_label">다운로드</string>
     <string name="menu_filter_all">모두</string>
@@ -161,6 +163,8 @@
     <string name="playlist_chooser_dialog_negative_button">취소</string>
     <string name="playlist_chooser_dialog_neutral_button">생성</string>
     <string name="playlist_chooser_dialog_title">플레이리스트 추가</string>
+    <string name="playlist_chooser_dialog_toast_add_success">재생 목록에 노래 추가</string>
+    <string name="playlist_chooser_dialog_toast_add_failure">재생 목록에 노래를 추가하지 못했습니다.</string>
     <string name="playlist_counted_tracks">%1$d 트랙 •  %2$s</string>
     <string name="playlist_duration">재생시간  •  %1$s</string>
     <string name="playlist_editor_dialog_hint_name">플레이리스트 이름</string>
@@ -246,7 +250,7 @@
     <string name="settings_download_storage_title">스토리지 다운로드</string>
     <string name="settings_equalizer_summary">오디오 설정 적용</string>
     <string name="settings_equalizer_title">이퀄라이저</string>
-    <string name="settings_github_link">https://github.com/CappielloAntonio/tempo</string>
+    <string name="settings_github_link">https://github.com/eddyizm/tempo</string>
     <string name="settings_github_summary">Follow the development</string>
     <string name="settings_github_title">Github</string>
     <string name="settings_image_size">이미지 해상도 설정</string>

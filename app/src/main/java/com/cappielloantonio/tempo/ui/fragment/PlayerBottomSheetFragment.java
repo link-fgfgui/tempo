@@ -112,6 +112,9 @@ public class PlayerBottomSheetFragment extends Fragment {
             try {
                 MediaBrowser mediaBrowser = mediaBrowserListenableFuture.get();
 
+                mediaBrowser.setShuffleModeEnabled(Preferences.isShuffleModeEnabled());
+                mediaBrowser.setRepeatMode(Preferences.getRepeatMode());
+
                 setMediaControllerListener(mediaBrowser);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -149,6 +152,16 @@ public class PlayerBottomSheetFragment extends Fragment {
             @Override
             public void onEvents(Player player, Player.Events events) {
                 setHeaderNextButtonState(mediaBrowser.hasNextMediaItem());
+            }
+
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+                Preferences.setShuffleModeEnabled(shuffleModeEnabled);
+            }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+                Preferences.setRepeatMode(repeatMode);
             }
         });
     }

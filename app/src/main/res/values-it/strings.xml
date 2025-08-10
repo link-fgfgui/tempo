@@ -3,7 +3,8 @@
 	<string name="activity_battery_optimizations_summary">Per favore, disabilita le ottimizzazioni della batteria per la riproduzione multimediale quando lo schermo è spento.</string>
 	<string name="activity_battery_optimizations_title">Ottimizzazioni della Batteria</string>
 	<string name="activity_info_offline_mode">Modalità offline</string>
-	<string name="album_bottom_sheet_add_to_queue">Aggiungi alla coda</string>
+    <string name="album_bottom_sheet_add_to_playlist">Aggiungi alla playlist</string>
+    <string name="album_bottom_sheet_add_to_queue">Aggiungi alla coda</string>
 	<string name="album_bottom_sheet_download_all">Scarica tutto</string>
 	<string name="album_bottom_sheet_go_to_artist">Vai all\'artista</string>
 	<string name="album_bottom_sheet_instant_mix">Mix istantaneo</string>
@@ -156,7 +157,8 @@
 	<string name="login_title_expanded">Server Subsonic</string>
 	<string name="media_route_menu_title">Trasmetti</string>
 	<string name="menu_add_button">Aggiungi</string>
-	<string name="menu_download_all_button">Scarica tutto</string>
+    <string name="menu_add_to_playlist_button">Aggiungi alla playlist</string>
+    <string name="menu_download_all_button">Scarica tutto</string>
 	<string name="menu_download_label">Scarica</string>
 	<string name="menu_filter_all">Tutti</string>
 	<string name="menu_filter_download">Scaricati</string>
@@ -188,6 +190,8 @@
 	<string name="playlist_chooser_dialog_negative_button">Annulla</string>
 	<string name="playlist_chooser_dialog_neutral_button">Crea</string>
 	<string name="playlist_chooser_dialog_title">Aggiungi a una playlist</string>
+	<string name="playlist_chooser_dialog_toast_add_success">Aggiunta di un brano alla playlist</string>
+	<string name="playlist_chooser_dialog_toast_add_failure">Impossibile aggiungere un brano alla playlist</string>
 	<string name="playlist_counted_tracks">%1$d brani • %2$s</string>
 	<string name="playlist_duration">Durata  •  %1$s</string>
 	<string name="playlist_editor_dialog_action_delete_toast">Premi a lungo per eliminare</string>
@@ -279,7 +283,7 @@
 	<string name="settings_download_storage_title">Archivio download</string>
 	<string name="settings_equalizer_summary">Regola le impostazioni audio</string>
 	<string name="settings_equalizer_title">Equalizzatore</string>
-	<string name="settings_github_link">https://github.com/CappielloAntonio/tempo</string>
+	<string name="settings_github_link">https://github.com/eddyizm/tempo</string>
 	<string name="settings_github_summary">Segui lo sviluppo</string>
 	<string name="settings_github_title">Github</string>
 	<string name="settings_image_size">Imposta risoluzione delle immagini</string>

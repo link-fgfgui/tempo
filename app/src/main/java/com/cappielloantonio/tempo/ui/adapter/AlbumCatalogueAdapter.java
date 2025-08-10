@@ -157,7 +157,7 @@ public class AlbumCatalogueAdapter extends RecyclerView.Adapter<AlbumCatalogueAd
                 albums.sort(Comparator.comparing(AlbumID3::getName));
                 break;
             case Constants.ALBUM_ORDER_BY_ARTIST:
-                albums.sort(Comparator.comparing(AlbumID3::getArtist));
+                albums.sort(Comparator.comparing(AlbumID3::getArtist, Comparator.nullsLast(Comparator.naturalOrder())));
                 break;
             case Constants.ALBUM_ORDER_BY_YEAR:
                 albums.sort(Comparator.comparing(AlbumID3::getYear));

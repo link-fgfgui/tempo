@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Layout;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +30,7 @@ import com.cappielloantonio.tempo.subsonic.models.Line;
 import com.cappielloantonio.tempo.subsonic.models.LyricsList;
 import com.cappielloantonio.tempo.util.MusicUtil;
 import com.cappielloantonio.tempo.util.OpenSubsonicExtensionsUtil;
+import com.cappielloantonio.tempo.util.Preferences;
 import com.cappielloantonio.tempo.viewmodel.PlayerBottomSheetViewModel;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -80,12 +83,16 @@ public class PlayerLyricsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         bindMediaController();
+        requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         releaseHandler();
+        if (!Preferences.isDisplayAlwaysOn()) {
+            requireActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     @Override
@@ -286,10 +293,18 @@ public class PlayerLyricsFragment extends Fragment {
     }
 
     private int getScroll(List<Line> lines, Line toHighlight) {
-        int lineHeight = bind.nowPlayingSongLyricsTextView.getLineHeight();
-        int lineCount = getLineCount(lines, toHighlight);
-        int scrollViewHeight = bind.nowPlayingSongLyricsSrollView.getHeight();
+        int startIndex = getStartPosition(lines, toHighlight);
+        Layout layout = bind.nowPlayingSongLyricsTextView.getLayout();
+        if (layout == null) return 0;
 
-        return lineHeight * lineCount < scrollViewHeight / 2 ? 0 : lineHeight * lineCount - scrollViewHeight / 2 + lineHeight;
+        int line = layout.getLineForOffset(startIndex);
+        int lineTop = layout.getLineTop(line);
+        int lineBottom = layout.getLineBottom(line);
+        int lineCenter = (lineTop + lineBottom) / 2;
+
+        int scrollViewHeight = bind.nowPlayingSongLyricsSrollView.getHeight();
+        int scroll = lineCenter - scrollViewHeight / 2;
+
+        return Math.max(scroll, 0);
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.LibraryResult
@@ -27,7 +28,7 @@ open class MediaLibrarySessionCallback(
         MediaBrowserTree.initialize(automotiveRepository)
     }
 
-    private val customLayoutCommandButtons: List<CommandButton> = listOf(
+    private val shuffleCommandButtons: List<CommandButton> = listOf(
         CommandButton.Builder()
             .setDisplayName(context.getString(R.string.exo_controls_shuffle_on_description))
             .setSessionCommand(
@@ -45,14 +46,45 @@ open class MediaLibrarySessionCallback(
             ).setIconResId(R.drawable.exo_icon_shuffle_on).build()
     )
 
+    private val repeatCommandButtons: List<CommandButton> = listOf(
+        CommandButton.Builder()
+            .setDisplayName(context.getString(R.string.exo_controls_repeat_off_description))
+            .setSessionCommand(SessionCommand(CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_OFF, Bundle.EMPTY))
+            .setIconResId(R.drawable.exo_icon_repeat_off)
+            .build(),
+        CommandButton.Builder()
+            .setDisplayName(context.getString(R.string.exo_controls_repeat_one_description))
+            .setSessionCommand(SessionCommand(CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_ONE, Bundle.EMPTY))
+            .setIconResId(R.drawable.exo_icon_repeat_one)
+            .build(),
+        CommandButton.Builder()
+            .setDisplayName(context.getString(R.string.exo_controls_repeat_all_description))
+            .setSessionCommand(SessionCommand(CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_ALL, Bundle.EMPTY))
+            .setIconResId(R.drawable.exo_icon_repeat_all)
+            .build()
+    )
+
+    private val customLayoutCommandButtons: List<CommandButton> =
+        shuffleCommandButtons + repeatCommandButtons
+
     @OptIn(UnstableApi::class)
     val mediaNotificationSessionCommands =
         MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
             .also { builder ->
-                customLayoutCommandButtons.forEach { commandButton ->
+                (shuffleCommandButtons + repeatCommandButtons).forEach { commandButton ->
                     commandButton.sessionCommand?.let { builder.add(it) }
                 }
             }.build()
+
+    fun buildCustomLayout(player: Player): ImmutableList<CommandButton> {
+        val shuffle = shuffleCommandButtons[if (player.shuffleModeEnabled) 1 else 0]
+        val repeat = when (player.repeatMode) {
+            Player.REPEAT_MODE_ONE -> repeatCommandButtons[1]
+            Player.REPEAT_MODE_ALL -> repeatCommandButtons[2]
+            else -> repeatCommandButtons[0]
+        }
+        return ImmutableList.of(shuffle, repeat)
+    }
 
     @OptIn(UnstableApi::class)
     override fun onConnect(
@@ -62,12 +94,11 @@ open class MediaLibrarySessionCallback(
                 controller
             ) || session.isAutoCompanionController(controller)
         ) {
-            val customLayout =
-                customLayoutCommandButtons[if (session.player.shuffleModeEnabled) 1 else 0]
+            val customLayout = buildCustomLayout(session.player)
 
             return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
                 .setAvailableSessionCommands(mediaNotificationSessionCommands)
-                .setCustomLayout(ImmutableList.of(customLayout)).build()
+                .setCustomLayout(customLayout).build()
         }
 
         return MediaSession.ConnectionResult.AcceptedResultBuilder(session).build()
@@ -80,25 +111,28 @@ open class MediaLibrarySessionCallback(
         customCommand: SessionCommand,
         args: Bundle
     ): ListenableFuture<SessionResult> {
-        if (CUSTOM_COMMAND_TOGGLE_SHUFFLE_MODE_ON == customCommand.customAction) {
-            session.player.shuffleModeEnabled = true
-            session.setCustomLayout(
-                session.mediaNotificationControllerInfo!!,
-                ImmutableList.of(customLayoutCommandButtons[1])
-            )
-
-            return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
-        } else if (CUSTOM_COMMAND_TOGGLE_SHUFFLE_MODE_OFF == customCommand.customAction) {
-            session.player.shuffleModeEnabled = false
-            session.setCustomLayout(
-                session.mediaNotificationControllerInfo!!,
-                ImmutableList.of(customLayoutCommandButtons[0])
-            )
-
-            return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+        when (customCommand.customAction) {
+            CUSTOM_COMMAND_TOGGLE_SHUFFLE_MODE_ON -> session.player.shuffleModeEnabled = true
+            CUSTOM_COMMAND_TOGGLE_SHUFFLE_MODE_OFF -> session.player.shuffleModeEnabled = false
+            CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_OFF,
+            CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_ALL,
+            CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_ONE -> {
+                val nextMode = when (session.player.repeatMode) {
+                    Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_ALL
+                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ONE
+                    else -> Player.REPEAT_MODE_OFF
+                }
+                session.player.repeatMode = nextMode
+            }
+            else -> return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
         }
 
-        return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
+        session.setCustomLayout(
+            session.mediaNotificationControllerInfo!!,
+            buildCustomLayout(session.player)
+        )
+
+        return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
     }
 
     override fun onGetLibraryRoot(
@@ -158,5 +192,11 @@ open class MediaLibrarySessionCallback(
             "android.media3.session.demo.SHUFFLE_ON"
         private const val CUSTOM_COMMAND_TOGGLE_SHUFFLE_MODE_OFF =
             "android.media3.session.demo.SHUFFLE_OFF"
+        private const val CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_OFF =
+            "android.media3.session.demo.REPEAT_OFF"
+        private const val CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_ONE =
+            "android.media3.session.demo.REPEAT_ONE"
+        private const val CUSTOM_COMMAND_TOGGLE_REPEAT_MODE_ALL =
+            "android.media3.session.demo.REPEAT_ALL"
     }
 }

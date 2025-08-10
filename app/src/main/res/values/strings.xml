@@ -3,6 +3,7 @@
     <string name="activity_battery_optimizations_summary">Please disable battery optimizations for media playback while the screen is off.</string>
     <string name="activity_battery_optimizations_title">Battery Optimizations</string>
     <string name="activity_info_offline_mode">Offline mode</string>
+    <string name="album_bottom_sheet_add_to_playlist">Add to playlist</string>
     <string name="album_bottom_sheet_add_to_queue">Add to queue</string>
     <string name="album_bottom_sheet_download_all">Download all</string>
     <string name="album_bottom_sheet_go_to_artist">Go to artist</string>
@@ -104,6 +105,9 @@
     <string name="home_rearrangement_dialog_positive_button">Save</string>
     <string name="home_rearrangement_dialog_title">Rearrange home</string>
     <string name="home_rearrangement_dialog_subtitle">Please note that in order for the changes made to take effect, it is necessary to restart the application.</string>
+    <string name="home_section_music">Music</string>
+    <string name="home_section_podcast">Podcast</string>
+    <string name="home_section_radio">Radio</string>
     <string name="home_subtitle_best_of">Top songs of your favorite artists</string>
     <string name="home_subtitle_made_for_you">Start mix from a song you liked</string>
     <string name="home_subtitle_new_internet_radio_station">Add a new radio</string>
@@ -158,6 +162,7 @@
     <string name="login_title_expanded">Subsonic servers</string>
     <string name="media_route_menu_title">Cast</string>
     <string name="menu_add_button">Add</string>
+    <string name="menu_add_to_playlist_button">Add to playlist</string>
     <string name="menu_download_all_button">Download all</string>
     <string name="menu_download_label">Download</string>
     <string name="menu_filter_all">All</string>
@@ -194,6 +199,8 @@
     <string name="playlist_chooser_dialog_negative_button">Cancel</string>
     <string name="playlist_chooser_dialog_neutral_button">Create</string>
     <string name="playlist_chooser_dialog_title">Add to a playlist</string>
+    <string name="playlist_chooser_dialog_toast_add_success">Added song to playlist</string>
+    <string name="playlist_chooser_dialog_toast_add_failure">Failed to add song to playlist</string>
     <string name="playlist_counted_tracks">%1$d tracks •  %2$s</string>
     <string name="playlist_duration">Duration  •  %1$s</string>
     <string name="playlist_editor_dialog_action_delete_toast">Long press to delete</string>
@@ -285,7 +292,7 @@
     <string name="settings_download_storage_title">Download storage</string>
     <string name="settings_equalizer_summary">Adjust audio settings</string>
     <string name="settings_equalizer_title">Equalizer</string>
-    <string name="settings_github_link">https://github.com/CappielloAntonio/tempo</string>
+    <string name="settings_github_link">https://github.com/eddyizm/tempo</string>
     <string name="settings_github_summary">Follow the development</string>
     <string name="settings_github_title">Github</string>
     <string name="settings_image_size">Set image resolution</string>
@@ -315,6 +322,7 @@
     <string name="settings_rounded_corner_summary">If enabled, sets a curvature angle for all rendered covers. The changes will take effect on restart.</string>
     <string name="settings_scan_title">Scan library</string>
     <string name="settings_scrobble_title">Enable music scrobbling</string>
+    <string name="settings_system_language">System language</string>
     <string name="settings_share_title">Enable music sharing</string>
     <string name="settings_streaming_cache_size">Size of streaming cache</string>
     <string name="settings_streaming_cache_storage_title">Streaming cache storage</string>
@@ -391,6 +399,7 @@
     <string name="support_url">https://buymeacoffee.com/a.cappiello</string>
     <string name="track_info_album">Album</string>
     <string name="track_info_artist">Artist</string>
+    <string name="track_info_bit_depth">Bit depth</string>
     <string name="track_info_bitrate">Bitrate</string>
     <string name="track_info_content_type">Content Type</string>
     <string name="track_info_dialog_positive_button">OK</string>
@@ -399,6 +408,7 @@
     <string name="track_info_duration">Duration</string>
     <string name="track_info_genre">Genre</string>
     <string name="track_info_path">Path</string>
+    <string name="track_info_sampling_rate">Sampling rate</string>
     <string name="track_info_size">Size</string>
     <string name="track_info_suffix">Suffix</string>
     <string name="track_info_summary_downloaded_file">The file has been downloaded using the Subsonic APIs. The codec and bitrate of the file remain unchanged from the source file.</string>

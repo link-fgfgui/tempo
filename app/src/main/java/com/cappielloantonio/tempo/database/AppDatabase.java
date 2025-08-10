@@ -28,9 +28,9 @@ import com.cappielloantonio.tempo.subsonic.models.Playlist;
 
 @UnstableApi
 @Database(
-        version = 10,
+        version = 11,
         entities = {Queue.class, Server.class, RecentSearch.class, Download.class, Chronology.class, Favorite.class, SessionMediaItem.class, Playlist.class},
-        autoMigrations = {@AutoMigration(from = 9, to = 10)}
+        autoMigrations = {@AutoMigration(from = 10, to = 11)}
 )
 @TypeConverters({DateConverters.class})
 public abstract class AppDatabase extends RoomDatabase {

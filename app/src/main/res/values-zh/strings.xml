@@ -3,6 +3,7 @@
     <string name="activity_battery_optimizations_summary">请禁用针对媒体锁屏播放的电池优化。</string>
     <string name="activity_battery_optimizations_title">电池优化</string>
     <string name="activity_info_offline_mode">离线模式</string>
+    <string name="album_bottom_sheet_add_to_playlist">添加到播放列表</string>
     <string name="album_bottom_sheet_add_to_queue">添加到队列</string>
     <string name="album_bottom_sheet_download_all">全部下载</string>
     <string name="album_bottom_sheet_go_to_artist">查看该艺术家</string>
@@ -137,6 +138,7 @@
     <string name="login_title_expanded">Subsonic 服务器</string>
     <string name="media_route_menu_title">投送</string>
     <string name="menu_add_button">添加</string>
+    <string name="menu_add_to_playlist_button">添加到播放列表</string>
     <string name="menu_download_all_button">全部下载</string>
     <string name="menu_download_label">下载</string>
     <string name="menu_filter_all">全部</string>
@@ -165,6 +167,8 @@
     <string name="playlist_chooser_dialog_negative_button">取消</string>
     <string name="playlist_chooser_dialog_neutral_button">新建</string>
     <string name="playlist_chooser_dialog_title">添加到播放列表</string>
+    <string name="playlist_chooser_dialog_toast_add_success">将歌曲添加到播放列表</string>
+    <string name="playlist_chooser_dialog_toast_add_failure">未能将歌曲添加到播放列表</string>
     <string name="playlist_counted_tracks">%1$d 首曲目 • %2$s</string>
     <string name="playlist_duration">持续时间 • %1$s</string>
     <string name="playlist_editor_dialog_hint_name">播放列表名称</string>
@@ -253,7 +257,7 @@
     <string name="settings_download_storage_title">下载存储</string>
     <string name="settings_equalizer_summary">调整音频设置</string>
     <string name="settings_equalizer_title">均衡器</string>
-    <string name="settings_github_link">https://github.com/CappielloAntonio/tempo</string>
+    <string name="settings_github_link">https://github.com/eddyizm/tempo</string>
     <string name="settings_github_summary">关注开发进展</string>
     <string name="settings_github_title">Github</string>
     <string name="settings_image_size">设置图像分辨率</string>
