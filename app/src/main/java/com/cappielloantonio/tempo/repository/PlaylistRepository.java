@@ -13,6 +13,7 @@ import com.cappielloantonio.tempo.App;
 import com.cappielloantonio.tempo.R;
 import com.cappielloantonio.tempo.database.AppDatabase;
 import com.cappielloantonio.tempo.database.dao.PlaylistDao;
+import com.cappielloantonio.tempo.subsonic.api.playlist.PlaylistClient;
 import com.cappielloantonio.tempo.subsonic.base.ApiResponse;
 import com.cappielloantonio.tempo.subsonic.models.Child;
 import com.cappielloantonio.tempo.subsonic.models.Playlist;
@@ -20,6 +21,8 @@ import com.cappielloantonio.tempo.subsonic.models.Playlist;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -117,11 +120,24 @@ public class PlaylistRepository {
     public void updatePlaylist(String playlistId, String name, ArrayList<String> songsId) {
         App.getSubsonicClientInstance(false)
                 .getPlaylistClient()
-                .deletePlaylist(playlistId)
+                .getPlaylist(playlistId)
                 .enqueue(new Callback<ApiResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
-                        createPlaylist(null, name, songsId);
+                        Playlist playlist = response.body().getSubsonicResponse().getPlaylist();
+                        App.getSubsonicClientInstance(false).getPlaylistClient()
+                                .updatePlaylist(playlistId, null, null,
+                                null, IntStream.range(0, playlist.getSongCount())
+                                        .boxed().collect(Collectors.toCollection(ArrayList::new))).enqueue(new Callback<ApiResponse>() {
+                            @Override
+                            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                                createPlaylist(playlistId, name, songsId);
+                            }
+
+                            @Override
+                            public void onFailure(Call<ApiResponse> call, Throwable throwable) {
+                            }
+                        });
                     }
 
                     @Override
