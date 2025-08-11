@@ -4,6 +4,9 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.TaskStackBuilder
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.media3.cast.CastPlayer
 import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.AudioAttributes
@@ -26,14 +29,38 @@ import com.cappielloantonio.tempo.util.ReplayGainUtil
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import cn.lyric.getter.api.API
+import cn.lyric.getter.api.data.ExtraData
+import com.cappielloantonio.tempo.App
+import com.cappielloantonio.tempo.subsonic.models.Line
+import com.cappielloantonio.tempo.subsonic.models.StructuredLyrics
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
+
 
 @UnstableApi
-class MediaService : MediaLibraryService(), SessionAvailabilityListener {
+class MediaService : MediaLibraryService(), SessionAvailabilityListener, CoroutineScope {
     private lateinit var automotiveRepository: AutomotiveRepository
     private lateinit var player: ExoPlayer
     private lateinit var castPlayer: CastPlayer
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private lateinit var librarySessionCallback: MediaLibrarySessionCallback
+
+    private var lga = API()
+
+    private val job = SupervisorJob()
+    private var currentLyricsList: List<StructuredLyrics>? = null
+
+    private val lyricsHandler = Handler(Looper.getMainLooper())
+    private lateinit var lyricsProgressRunnable: Runnable
+    private var lastSentLyricLine: String = ""
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
 
     override fun onCreate() {
         super.onCreate()
@@ -43,11 +70,43 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
         initializeCastPlayer()
         initializeMediaLibrarySession()
         initializePlayerListener()
+        initializeSyncedLyric()
 
         setPlayer(
                 null,
                 if (this::castPlayer.isInitialized && castPlayer.isCastSessionAvailable) castPlayer else player
         )
+    }
+
+    private fun isLyricOK(): Boolean {
+        return player.isPlaying && player.currentMediaItem != null && currentLyricsList != null
+    }
+
+    private fun initializeSyncedLyric() {
+        lyricsProgressRunnable = Runnable {
+            var toSleep: Long = 500
+            if (isLyricOK()) {
+                if (currentLyricsList!!.isNotEmpty() && currentLyricsList!!.first().synced) {
+                    var lines = currentLyricsList!!.first().line!!
+                    for ((index, line) in lines.withIndex()) {
+                        val curPos = player.currentPosition
+                        if (curPos < line.start!!) {
+                            var readySendLine = lines[if (index > 0) index - 1 else 0].value
+                            toSleep = line.start!! - curPos + 10
+                            if (lga.hasEnable) {
+                                lga.sendLyric(readySendLine)
+                            }else {
+                                Log.w("MusicService","lga: "+lga.hasEnable.toString())
+                            }
+                            lastSentLyricLine = readySendLine
+                            break
+                        }
+                    }
+                }
+            }
+            lyricsHandler.postDelayed(lyricsProgressRunnable, toSleep)
+        }
+        lyricsProgressRunnable.run()
     }
 
     override fun onGetSession(controllerInfo: ControllerInfo): MediaLibrarySession {
@@ -65,6 +124,7 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
     override fun onDestroy() {
         releasePlayer()
         super.onDestroy()
+        job.cancel()
     }
 
     private fun initializeRepository() {
@@ -116,6 +176,16 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
         player.addListener(object : Player.Listener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 if (mediaItem == null) return
+                currentLyricsList = null;
+                lastSentLyricLine = "";
+                launch(Dispatchers.IO) {
+                    val response: List<StructuredLyrics>? =
+                        App.getSubsonicClientInstance(false).openClient.getLyricsBySongId(mediaItem.mediaId)
+                            .execute().body()?.subsonicResponse?.lyricsList?.structuredLyrics
+                    withContext(Dispatchers.Main) {
+                        currentLyricsList = response
+                    }
+                }
 
                 if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK || reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
                     MediaManager.setLastPlayedTimestamp(mediaItem)
@@ -159,7 +229,8 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener {
                     reason: Int
             ) {
                 super.onPositionDiscontinuity(oldPosition, newPosition, reason)
-
+                lyricsHandler.removeCallbacks(lyricsProgressRunnable)
+                lyricsProgressRunnable.run()
                 if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
                     if (oldPosition.mediaItem?.mediaMetadata?.extras?.getString("type") == Constants.MEDIA_TYPE_MUSIC) {
                         MediaManager.scrobble(oldPosition.mediaItem, true)

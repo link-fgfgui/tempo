@@ -26,3 +26,6 @@
 
 -keep class **.reflect.TypeToken { *; }
 -keep class * extends **.reflect.TypeToken
+
+-keep class cn.lyric.getter.api.data.*{*;}
+-keep class cn.lyric.getter.api.API{*;}
