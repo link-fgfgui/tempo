@@ -38,6 +38,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 
 import java.util.List;
+import java.util.function.Supplier;
 
 
 @OptIn(markerClass = UnstableApi.class)
@@ -166,16 +167,16 @@ public class PlayerLyricsFragment extends Fragment {
         private final List<Line> lyricsList;
         private int highlightedIndex = -2;
 
-        private final MediaBrowser mediaBrowser;
+        private final Supplier<MediaBrowser> mediaBrowser;
 
-        public LyricsAdapter(String s, MediaBrowser mb) {
+        public LyricsAdapter(String s, Supplier<MediaBrowser> mb) {
             Line l = new Line();
             l.setValue(s);
             this.lyricsList = List.of(l);
             mediaBrowser = mb;
         }
 
-        public LyricsAdapter(LyricsList lyricsList, MediaBrowser mb) {
+        public LyricsAdapter(LyricsList lyricsList, Supplier<MediaBrowser> mb) {
             this.lyricsList = lyricsList.getStructuredLyrics().get(0).getLine();
             highlightedIndex = -1;
             mediaBrowser = mb;
@@ -211,8 +212,10 @@ public class PlayerLyricsFragment extends Fragment {
             holder.textView.setClickable(true);
             holder.textView.setOnClickListener(v -> {
                 Integer target = lyricsList.get(holder.getBindingAdapterPosition()).getStart();
-                if (target != null && mediaBrowser != null) {
-                    mediaBrowser.seekTo(target);
+                if (target != null && mediaBrowser.get() != null) {
+                    mediaBrowser.get().seekTo(target);
+                }else {
+                    Log.i(TAG, "mediaBrowser not found!");
                 }
             });
             if (highlightedIndex != -2) {
@@ -238,7 +241,7 @@ public class PlayerLyricsFragment extends Fragment {
                 bind.nowPlayingSongLyricsRecyclerView.smoothScrollBy(0, 0);
 
                 if (lyrics != null && !lyrics.trim().equals("")) {
-                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics, mediaBrowser));
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics,()->mediaBrowser));
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.GONE);
@@ -249,7 +252,7 @@ public class PlayerLyricsFragment extends Fragment {
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.VISIBLE);
                 } else if (description != null && !description.trim().equals("")) {
-                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics, mediaBrowser));
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics, ()->mediaBrowser));
                     bind.nowPlayingSongLyricsRecyclerView.setVisibility(View.VISIBLE);
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
@@ -268,7 +271,7 @@ public class PlayerLyricsFragment extends Fragment {
     @SuppressLint("DefaultLocale")
     private void setSyncLirics(LyricsList lyricsList) {
         if (lyricsList.getStructuredLyrics() != null && !lyricsList.getStructuredLyrics().isEmpty() && lyricsList.getStructuredLyrics().get(0).getLine() != null) {
-            bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyricsList, mediaBrowser));
+            bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyricsList, ()->mediaBrowser));
         }
     }
 
