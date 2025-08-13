@@ -87,9 +87,23 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener, Corouti
             var toSleep: Long = 500
             if (isLyricOK()) {
                 if (currentLyricsList!!.isNotEmpty() && currentLyricsList!!.first().synced) {
+                    val curPos = player.currentPosition
                     var lines = currentLyricsList!!.first().line!!
-                    for ((index, line) in lines.withIndex()) {
-                        val curPos = player.currentPosition
+                    var index = 0;
+                    while (true) {
+                        if (index==lines.size){
+                            val line = lines.last()
+                            var readySendLine = line.value
+                            toSleep = line.start!! - curPos + 10
+                            if (lga.hasEnable) {
+                                lga.sendLyric(readySendLine)
+                            }else {
+                                Log.w("MusicService","lga: "+lga.hasEnable.toString())
+                            }
+                            lastSentLyricLine = readySendLine
+                            break
+                        }
+                        val line = lines[index]
                         if (curPos < line.start!!) {
                             var readySendLine = lines[if (index > 0) index - 1 else 0].value
                             toSleep = line.start!! - curPos + 10
@@ -101,6 +115,7 @@ class MediaService : MediaLibraryService(), SessionAvailabilityListener, Corouti
                             lastSentLyricLine = readySendLine
                             break
                         }
+                        index++
                     }
                 }
             }
