@@ -53,9 +53,7 @@ public class PlayerLyricsFragment extends Fragment {
 
     private boolean isUserTouching = false;
 
-    private final Runnable resetTouchingStateRunnable = () -> {
-        isUserTouching = false;
-    };
+    private final Runnable resetTouchingStateRunnable = () -> isUserTouching = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -113,9 +111,7 @@ public class PlayerLyricsFragment extends Fragment {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initOverlay() {
-        bind.syncLyricsTapButton.setOnClickListener(view -> {
-            playerBottomSheetViewModel.changeSyncLyricsState();
-        });
+        bind.syncLyricsTapButton.setOnClickListener(view -> playerBottomSheetViewModel.changeSyncLyricsState());
         bind.nowPlayingSongLyricsRecyclerView.setOnTouchListener((View v, MotionEvent event) -> {
             if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
                 if (!isUserTouching) isUserTouching = true;
@@ -170,15 +166,19 @@ public class PlayerLyricsFragment extends Fragment {
         private final List<Line> lyricsList;
         private int highlightedIndex = -2;
 
-        public LyricsAdapter(String s) {
+        private final MediaBrowser mediaBrowser;
+
+        public LyricsAdapter(String s, MediaBrowser mb) {
             Line l = new Line();
             l.setValue(s);
             this.lyricsList = List.of(l);
+            mediaBrowser = mb;
         }
 
-        public LyricsAdapter(LyricsList lyricsList) {
+        public LyricsAdapter(LyricsList lyricsList, MediaBrowser mb) {
             this.lyricsList = lyricsList.getStructuredLyrics().get(0).getLine();
             highlightedIndex = -1;
+            mediaBrowser = mb;
         }
 
         public void setHighlightedIndex(int index) {
@@ -208,6 +208,13 @@ public class PlayerLyricsFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull LyricsViewHolder holder, int lineIndex) {
             holder.textView.setText(lyricsList.get(lineIndex).value);
+            holder.textView.setClickable(true);
+            holder.textView.setOnClickListener(v -> {
+                Integer target = lyricsList.get(holder.getBindingAdapterPosition()).getStart();
+                if (target != null && mediaBrowser != null) {
+                    mediaBrowser.seekTo(target);
+                }
+            });
             if (highlightedIndex != -2) {
                 if (lineIndex == highlightedIndex) {
                     holder.textView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.lyricsTextColor));
@@ -231,7 +238,7 @@ public class PlayerLyricsFragment extends Fragment {
                 bind.nowPlayingSongLyricsRecyclerView.smoothScrollBy(0, 0);
 
                 if (lyrics != null && !lyrics.trim().equals("")) {
-                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics));
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics, mediaBrowser));
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.GONE);
@@ -242,7 +249,7 @@ public class PlayerLyricsFragment extends Fragment {
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.VISIBLE);
                 } else if (description != null && !description.trim().equals("")) {
-                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics));
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics, mediaBrowser));
                     bind.nowPlayingSongLyricsRecyclerView.setVisibility(View.VISIBLE);
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
@@ -261,7 +268,7 @@ public class PlayerLyricsFragment extends Fragment {
     @SuppressLint("DefaultLocale")
     private void setSyncLirics(LyricsList lyricsList) {
         if (lyricsList.getStructuredLyrics() != null && !lyricsList.getStructuredLyrics().isEmpty() && lyricsList.getStructuredLyrics().get(0).getLine() != null) {
-            bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyricsList));
+            bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyricsList, mediaBrowser));
         }
     }
 
