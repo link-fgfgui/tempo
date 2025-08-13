@@ -2,34 +2,34 @@ package com.cappielloantonio.tempo.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Layout;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaBrowser;
 import androidx.media3.session.SessionToken;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.cappielloantonio.tempo.R;
 import com.cappielloantonio.tempo.databinding.InnerFragmentPlayerLyricsBinding;
 import com.cappielloantonio.tempo.service.MediaService;
 import com.cappielloantonio.tempo.subsonic.models.Line;
 import com.cappielloantonio.tempo.subsonic.models.LyricsList;
-import com.cappielloantonio.tempo.util.MusicUtil;
 import com.cappielloantonio.tempo.util.OpenSubsonicExtensionsUtil;
 import com.cappielloantonio.tempo.util.Preferences;
 import com.cappielloantonio.tempo.viewmodel.PlayerBottomSheetViewModel;
@@ -53,8 +53,8 @@ public class PlayerLyricsFragment extends Fragment {
 
     private boolean isUserTouching = false;
 
-    private final Runnable resetTouchingStateRunnable = ()->{
-        isUserTouching=false;
+    private final Runnable resetTouchingStateRunnable = () -> {
+        isUserTouching = false;
     };
 
     @Override
@@ -116,13 +116,13 @@ public class PlayerLyricsFragment extends Fragment {
         bind.syncLyricsTapButton.setOnClickListener(view -> {
             playerBottomSheetViewModel.changeSyncLyricsState();
         });
-        bind.nowPlayingSongLyricsSrollView.setOnTouchListener((View v, MotionEvent event)->{
-                if (event.getActionMasked()==MotionEvent.ACTION_MOVE){
-                    if (!isUserTouching) isUserTouching=true;
-                    syncLyricsHandler.removeCallbacks(resetTouchingStateRunnable);
-                    syncLyricsHandler.postDelayed(resetTouchingStateRunnable, 2000);
-                }
-                return false;
+        bind.nowPlayingSongLyricsRecyclerView.setOnTouchListener((View v, MotionEvent event) -> {
+            if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                if (!isUserTouching) isUserTouching = true;
+                syncLyricsHandler.removeCallbacks(resetTouchingStateRunnable);
+                syncLyricsHandler.postDelayed(resetTouchingStateRunnable, 2000);
+            }
+            return false;
         });
 
     }
@@ -165,31 +165,91 @@ public class PlayerLyricsFragment extends Fragment {
         }
     }
 
+    static class LyricsAdapter extends RecyclerView.Adapter<LyricsAdapter.LyricsViewHolder> {
+
+        private final List<Line> lyricsList;
+        private int highlightedIndex = -2;
+
+        public LyricsAdapter(String s) {
+            Line l = new Line();
+            l.setValue(s);
+            this.lyricsList = List.of(l);
+        }
+
+        public LyricsAdapter(LyricsList lyricsList) {
+            this.lyricsList = lyricsList.getStructuredLyrics().get(0).getLine();
+            highlightedIndex = -1;
+        }
+
+        public void setHighlightedIndex(int index) {
+            if (index != highlightedIndex) {
+                notifyItemChanged(highlightedIndex);
+                notifyItemChanged(index);
+                highlightedIndex = index;
+            }
+        }
+
+        static class LyricsViewHolder extends RecyclerView.ViewHolder {
+            TextView textView;
+
+            LyricsViewHolder(TextView v) {
+                super(v);
+                textView = v;
+            }
+        }
+
+        @NonNull
+        @Override
+        public LyricsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            TextView tv = new TextView(parent.getContext(), null, 0, R.style.BodyLarge);
+            return new LyricsViewHolder(tv);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull LyricsViewHolder holder, int lineIndex) {
+            holder.textView.setText(lyricsList.get(lineIndex).value);
+            if (highlightedIndex != -2) {
+                if (lineIndex == highlightedIndex) {
+                    holder.textView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.lyricsTextColor));
+                    holder.textView.setTypeface(null, Typeface.BOLD);
+                } else {
+                    holder.textView.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.shadowsLyricsTextColor));
+                    holder.textView.setTypeface(null, Typeface.BOLD);
+                }
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return lyricsList.size();
+        }
+    }
+
     private void setPanelContent(String lyrics, LyricsList lyricsList) {
         playerBottomSheetViewModel.getLiveDescription().observe(getViewLifecycleOwner(), description -> {
             if (bind != null) {
-                bind.nowPlayingSongLyricsSrollView.smoothScrollTo(0, 0);
+                bind.nowPlayingSongLyricsRecyclerView.smoothScrollBy(0, 0);
 
                 if (lyrics != null && !lyrics.trim().equals("")) {
-                    bind.nowPlayingSongLyricsTextView.setText(MusicUtil.getReadableLyrics(lyrics));
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics));
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.GONE);
                 } else if (lyricsList != null && lyricsList.getStructuredLyrics() != null) {
                     setSyncLirics(lyricsList);
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
+                    bind.nowPlayingSongLyricsRecyclerView.setVisibility(View.VISIBLE);
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.VISIBLE);
                 } else if (description != null && !description.trim().equals("")) {
-                    bind.nowPlayingSongLyricsTextView.setText(MusicUtil.getReadableLyrics(description));
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.VISIBLE);
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyrics));
+                    bind.nowPlayingSongLyricsRecyclerView.setVisibility(View.VISIBLE);
                     bind.emptyDescriptionImageView.setVisibility(View.GONE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.GONE);
                     bind.syncLyricsTapButton.setVisibility(View.GONE);
                 } else {
-                    bind.nowPlayingSongLyricsTextView.setVisibility(View.GONE);
+                    bind.nowPlayingSongLyricsRecyclerView.setAdapter(null);
+                    bind.nowPlayingSongLyricsRecyclerView.setVisibility(View.GONE);
                     bind.emptyDescriptionImageView.setVisibility(View.VISIBLE);
                     bind.titleEmptyDescriptionLabel.setVisibility(View.VISIBLE);
                     bind.syncLyricsTapButton.setVisibility(View.GONE);
@@ -201,16 +261,7 @@ public class PlayerLyricsFragment extends Fragment {
     @SuppressLint("DefaultLocale")
     private void setSyncLirics(LyricsList lyricsList) {
         if (lyricsList.getStructuredLyrics() != null && !lyricsList.getStructuredLyrics().isEmpty() && lyricsList.getStructuredLyrics().get(0).getLine() != null) {
-            StringBuilder lyricsBuilder = new StringBuilder();
-            List<Line> lines = lyricsList.getStructuredLyrics().get(0).getLine();
-
-            if (lines != null) {
-                for (Line line : lines) {
-                    lyricsBuilder.append(line.getValue().trim()).append("\n");
-                }
-            }
-
-            bind.nowPlayingSongLyricsTextView.setText(lyricsBuilder.toString());
+            bind.nowPlayingSongLyricsRecyclerView.setAdapter(new LyricsAdapter(lyricsList));
         }
     }
 
@@ -246,78 +297,37 @@ public class PlayerLyricsFragment extends Fragment {
         int timestamp = (int) (mediaBrowser.getCurrentPosition());
 
         if (lyricsList != null && lyricsList.getStructuredLyrics() != null && !lyricsList.getStructuredLyrics().isEmpty() && lyricsList.getStructuredLyrics().get(0).getLine() != null) {
-            StringBuilder lyricsBuilder = new StringBuilder();
             List<Line> lines = lyricsList.getStructuredLyrics().get(0).getLine();
 
             if (lines == null || lines.isEmpty()) return;
 
-            for (Line line : lines) {
-                lyricsBuilder.append(line.getValue().trim()).append("\n");
-            }
-
-            Line toHighlight = lines.stream().filter(line -> line != null && line.getStart() != null && line.getStart() < timestamp).reduce((first, second) -> second).orElse(null);
-
-            if (toHighlight != null) {
-                String lyrics = lyricsBuilder.toString();
-                Spannable spannableString = new SpannableString(lyrics);
-
-                int startingPosition = getStartPosition(lines, toHighlight);
-                int endingPosition = startingPosition + toHighlight.getValue().length();
-
-                spannableString.setSpan(new ForegroundColorSpan(requireContext().getResources().getColor(R.color.shadowsLyricsTextColor, null)), 0, lyrics.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                spannableString.setSpan(new ForegroundColorSpan(requireContext().getResources().getColor(R.color.lyricsTextColor, null)), startingPosition, endingPosition, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                bind.nowPlayingSongLyricsTextView.setText(spannableString);
-
-                if (playerBottomSheetViewModel.getSyncLyricsState() && !isUserTouching) {
-                    bind.nowPlayingSongLyricsSrollView.smoothScrollTo(0, getScroll(lines, toHighlight));
+            int index = 0;
+            int lineIndexToHighlight = -1;
+            while (true) {
+                if (index == lines.size()) {
+                    lineIndexToHighlight = lines.size() - 1;
+                    break;
                 }
+                Line line = lines.get(index);
+                if (line != null && line.getStart() != null) {
+                    if (timestamp < line.getStart()) {
+                        lineIndexToHighlight = index - 1;
+                        break;
+                    }
+                }
+                index++;
+            }
+
+            LyricsAdapter adapter = (LyricsAdapter) bind.nowPlayingSongLyricsRecyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.setHighlightedIndex(lineIndexToHighlight);
+            }
+
+            if (lineIndexToHighlight > -1 && playerBottomSheetViewModel.getSyncLyricsState() && !isUserTouching) {
+                LinearLayoutManager layoutManager = (LinearLayoutManager) bind.nowPlayingSongLyricsRecyclerView.getLayoutManager();
+                assert layoutManager != null;
+                layoutManager.scrollToPositionWithOffset(Math.max(lineIndexToHighlight, 0), bind.nowPlayingSongLyricsRecyclerView.getHeight() / 2);
             }
         }
-    }
-
-    private int getStartPosition(List<Line> lines, Line toHighlight) {
-        int start = 0;
-
-        for (Line line : lines) {
-            if (line != toHighlight) {
-                start = start + line.getValue().length() + 1;
-            } else {
-                break;
-            }
-        }
-
-        return start;
-    }
-
-    private int getLineCount(List<Line> lines, Line toHighlight) {
-        int start = 0;
-
-        for (Line line : lines) {
-            if (line != toHighlight) {
-                bind.tempLyricsLineTextView.setText(line.getValue());
-                start = start + bind.tempLyricsLineTextView.getLineCount();
-            } else {
-                break;
-            }
-        }
-
-        return start;
-    }
-
-    private int getScroll(List<Line> lines, Line toHighlight) {
-        int startIndex = getStartPosition(lines, toHighlight);
-        Layout layout = bind.nowPlayingSongLyricsTextView.getLayout();
-        if (layout == null) return 0;
-
-        int line = layout.getLineForOffset(startIndex);
-        int lineTop = layout.getLineTop(line);
-        int lineBottom = layout.getLineBottom(line);
-        int lineCenter = (lineTop + lineBottom) / 2;
-
-        int scrollViewHeight = bind.nowPlayingSongLyricsSrollView.getHeight();
-        int scroll = lineCenter - scrollViewHeight / 2;
-
-        return Math.max(scroll, 0);
     }
 }

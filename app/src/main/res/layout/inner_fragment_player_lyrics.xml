@@ -31,25 +31,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/empty_description_image_view" />
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/now_playing_song_lyrics_sroll_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/now_playing_song_lyrics_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/now_playing_song_lyrics_text_view"
-            style="@style/BodyLarge"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.core.widget.NestedScrollView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/sync_lyrics_tap_button"
@@ -65,8 +56,8 @@
         android:alpha="0.7"
         android:visibility="visible"
         app:icon="@drawable/ic_lyrics_sync_lock"
-        app:layout_constraintEnd_toEndOf="@+id/now_playing_song_lyrics_sroll_view"
-        app:layout_constraintBottom_toBottomOf="@+id/now_playing_song_lyrics_sroll_view" />
+        app:layout_constraintEnd_toEndOf="@+id/now_playing_song_lyrics_recycler_view"
+        app:layout_constraintBottom_toBottomOf="@+id/now_playing_song_lyrics_recycler_view" />
 
     <TextView
         android:id="@+id/temp_lyrics_line_text_view"
