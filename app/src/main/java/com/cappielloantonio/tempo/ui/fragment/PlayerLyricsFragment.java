@@ -10,6 +10,7 @@ import android.text.Layout;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -49,6 +50,12 @@ public class PlayerLyricsFragment extends Fragment {
     private MediaBrowser mediaBrowser;
     private Handler syncLyricsHandler;
     private Runnable syncLyricsRunnable;
+
+    private boolean isUserTouching = false;
+
+    private final Runnable resetTouchingStateRunnable = ()->{
+        isUserTouching=false;
+    };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -104,10 +111,20 @@ public class PlayerLyricsFragment extends Fragment {
         bind = null;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initOverlay() {
         bind.syncLyricsTapButton.setOnClickListener(view -> {
             playerBottomSheetViewModel.changeSyncLyricsState();
         });
+        bind.nowPlayingSongLyricsSrollView.setOnTouchListener((View v, MotionEvent event)->{
+                if (event.getActionMasked()==MotionEvent.ACTION_MOVE){
+                    if (!isUserTouching) isUserTouching=true;
+                    syncLyricsHandler.removeCallbacks(resetTouchingStateRunnable);
+                    syncLyricsHandler.postDelayed(resetTouchingStateRunnable, 2000);
+                }
+                return false;
+        });
+
     }
 
     private void initializeBrowser() {
@@ -252,7 +269,7 @@ public class PlayerLyricsFragment extends Fragment {
 
                 bind.nowPlayingSongLyricsTextView.setText(spannableString);
 
-                if (playerBottomSheetViewModel.getSyncLyricsState()) {
+                if (playerBottomSheetViewModel.getSyncLyricsState() && !isUserTouching) {
                     bind.nowPlayingSongLyricsSrollView.smoothScrollTo(0, getScroll(lines, toHighlight));
                 }
             }
