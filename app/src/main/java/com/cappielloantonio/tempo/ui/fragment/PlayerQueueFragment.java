@@ -214,6 +214,6 @@ public class PlayerQueueFragment extends Fragment implements ClickCallback {
 
     @Override
     public void onMediaClick(Bundle bundle) {
-        MediaManager.startQueue(mediaBrowserListenableFuture, bundle.getParcelableArrayList(Constants.TRACKS_OBJECT), bundle.getInt(Constants.ITEM_POSITION));
+        MediaManager.changeQueueIndex(mediaBrowserListenableFuture, bundle.getInt(Constants.ITEM_POSITION));
     }
 }

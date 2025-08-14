@@ -24,6 +24,7 @@ import com.cappielloantonio.tempo.util.Preferences;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -131,6 +132,23 @@ public class MediaManager {
                         mediaBrowserListenableFuture.get().prepare();
                         mediaBrowserListenableFuture.get().play();
                         enqueueDatabase(media, true, 0);
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }, MoreExecutors.directExecutor());
+        }
+    }
+
+    public static void changeQueueIndex(ListenableFuture<MediaBrowser> mediaBrowserListenableFuture, int startIndex) {
+        if (mediaBrowserListenableFuture != null) {
+            mediaBrowserListenableFuture.addListener(() -> {
+                try {
+                    if (mediaBrowserListenableFuture.isDone()) {
+                        mediaBrowserListenableFuture.get().prepare();
+                        mediaBrowserListenableFuture.get().seekTo(startIndex, 0);
+                        mediaBrowserListenableFuture.get().play();
+                        enqueueDatabase(new ArrayList<>(), false, 0);
                     }
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
